@@ -67,6 +67,18 @@ jobs:
           paths: [backend/node_modules]
           key: backend-build
 
+  test-frontend:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-test]
+      - run:
+          name: run front-end test
+          command: |
+            cd frontend
+            npm install
+            npm run test
 
 
 
@@ -76,3 +88,5 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
+      - test-frontend:
+          requires: [build-frontend]
