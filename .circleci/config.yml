@@ -202,6 +202,9 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
+      
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
   
   configure-infrastructure:
     docker:
@@ -243,6 +246,7 @@ jobs:
           root: ~/
           paths:
             - project/backend/.env
+      
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
  
@@ -251,7 +255,6 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - nodejs
       - awscli
       - restore_cache:
           keys: [backend-deps]
