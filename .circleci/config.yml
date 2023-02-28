@@ -108,6 +108,21 @@ jobs:
             npm install
             npm audit fix --audit-level=critical
 
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-scan]
+      - run:
+          command: |
+            cd backend
+            npm install
+            npm audit fix --audit-level=critical
+
+
+
 
 
 workflows:
@@ -121,3 +136,5 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]
