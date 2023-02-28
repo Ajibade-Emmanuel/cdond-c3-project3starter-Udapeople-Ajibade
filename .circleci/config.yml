@@ -202,6 +202,8 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
   
   configure-infrastructure:
     docker:
@@ -243,6 +245,8 @@ jobs:
           root: ~/
           paths:
             - project/backend/.env
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
  
   run-migrations:
     docker:
@@ -271,6 +275,8 @@ jobs:
             else
               echo "No migrations are pending" 
             fi
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
   
 
 
