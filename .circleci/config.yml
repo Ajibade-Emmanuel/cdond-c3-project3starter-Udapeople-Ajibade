@@ -178,7 +178,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              --tags project=udapeople
+              --tags project=udapeople \
       
       - run:
           name: Ensure front-end infrastructure exist
@@ -187,7 +187,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              --tags project=udapeople
+              --tags project=udapeople \
       
       - run:
           name: Add back-end ip to ansible inventory
@@ -195,7 +195,8 @@ jobs:
             aws ec2 describe-instances \
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text >> .circleci/ansible/inventory.txt
+              --output text >> ~/project/.circleci/ansible/inventory.txt
+              cat ~/project/.circleci/ansible/inventory.txt
       
       - persist_to_workspace:
           root: ~/
@@ -217,15 +218,19 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
-            apk add --update tar
-            apk add --update gzip
+            apk add --update --no-cache ansible tar gzip aws-cli openssh
+
       - attach_workspace:
           at: ~/
 
       - run:
           name: configure server
           command: |
+            pwd
+            cd .circleci/ansible
+            ls -al
+            cat ~/project/backend/.env
+            ansible-playbook -i inventory.txt configure-server.yml
             echo NODE_ENV=production > ~/project/backend/.env
             echo VERSION: "1" >> ~/project/backend/.env
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> ~/project/backend/.env
@@ -237,9 +242,6 @@ jobs:
             echo TYPEORM_PORT=$TYPEORM_PORT >> ~/project/backend/.env
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ~/project/backend/.env
             echo TYPEORM_HOST=$TYPEORM_HOST >> ~/project/backend/.env
-            cat ~/project/backend/.env
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
           no_output_timeout: 27m
 
       - persist_to_workspace:
