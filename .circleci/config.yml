@@ -218,7 +218,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update --no-cache ansible tar gzip aws-cli openssh
+            apk add --update --no-cache ansible tar gzip awscliv2 openssh
 
       - attach_workspace:
           at: ~/
