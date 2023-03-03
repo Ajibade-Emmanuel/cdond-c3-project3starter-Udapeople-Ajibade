@@ -218,7 +218,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update --no-cache ansible tar gzip openssh
+            apk add --update ansible
+            apk add --update tar
+            apk add --update gzip
 
       - attach_workspace:
           at: ~/
@@ -240,7 +242,7 @@ jobs:
             cat ~/project/backend/.env
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
-          no_output_timeout: 50m
+          no_output_timeout: 30m
 
       - persist_to_workspace:
           root: ~/
