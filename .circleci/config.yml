@@ -284,7 +284,7 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: cimg/python:3.10
+      - image: amazon/aws-cli
     
     steps:
       - checkout
