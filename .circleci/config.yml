@@ -284,19 +284,16 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: circleci/node:13.8.0
-
+      - image: cimg/python:3.10
+    
     steps:
       - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            sudo apt update && \
-            sudo apt install -y tar gzip curl
-
+      - install_nodejs
+      - install_awscli
+  
       - attach_workspace:
           at: ~/
-
+      
       - run:
           name: Get backend url
           command: |
@@ -311,7 +308,7 @@ jobs:
             cat frontend/.env
             # export API_URL="http://${BACKEND_IP}:3030"
             # echo "${API_URL}"
-
+      
       - run:
           name: Deploy frontend objects
           command: |
@@ -330,12 +327,10 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure   
-
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
-
       - revert-migrations:
-          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}" 
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 
 
@@ -364,5 +359,5 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
