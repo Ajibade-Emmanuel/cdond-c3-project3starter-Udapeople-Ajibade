@@ -343,7 +343,60 @@ jobs:
       - revert-migrations:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
+  deploy-backend:
+    docker:
+      - image: amazon/aws-cli
 
+    steps:
+      - checkout
+      - awscli
+      - ansible
+      - nodejs
+
+      - add_ssh_keys:
+          fingerprints: ["d9:5e:d2:71:ad:88:79:06:5e:6a:27:18:6a:0d:8b:f6"]
+
+      - attach_workspace:
+          at: ~/
+
+      - restore_cache:
+          keys: [backend-build]
+
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+            npm run build
+            cd ..
+
+      - run:
+          name: Package Backend
+          command: |
+            tar -C backend -czvf artifact.tar.gz .
+            cp artifact.tar.gz  ~/
+
+      - run:
+          name: Checking the existence of inventory.txt && artifact.tar.gz file
+          command: |
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            echo "Contents of files folder is -------"
+            ls ~/
+
+      - run:
+          name: Deploy backend
+          command: |
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 
 
@@ -371,4 +424,6 @@ workflows:
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
           requires: [run-migrations]
