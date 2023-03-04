@@ -291,10 +291,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
-            apk add --update tar
-            apk add --update gzip
-            apk add --update nodejs
+            sudo apt update && \
+            sudo apt install -y tar gzip curl
 
       - attach_workspace:
           at: ~/
