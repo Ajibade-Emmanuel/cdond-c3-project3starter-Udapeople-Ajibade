@@ -288,9 +288,7 @@ jobs:
     
     steps:
       - checkout
-      - nodejs
-      - awscli
-  
+      
       - attach_workspace:
           at: ~/
       
