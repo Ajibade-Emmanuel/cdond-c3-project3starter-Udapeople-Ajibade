@@ -265,34 +265,34 @@ jobs:
       
       - destroy-environment
  
-  # run-migrations:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
+  run-migrations:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
       
-  #     - restore_cache:
-  #         keys: [backend-scan]
-  #     - run:
-  #         name: Run migrations
-  #         command: |
-  #           cd backend
-  #           npm install
-  #           npm run migrations > migrations_dump.txt
-  #           echo "has been executed successfully." >> migrations_dump.txt
-  #           cat migrations_dump.txt
+      - restore_cache:
+          keys: [backend-scan]
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm install
+            npm run migrations > migrations_dump.txt
+            echo "has been executed successfully." >> migrations_dump.txt
+            cat migrations_dump.txt
       
-  #     - run:
-  #         name: Send migration status to kvdb.io
-  #         command: |
-  #           if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-  #           then  
-  #               curl -k https://kvdb.io/QEJEyEvRANuKVVDM2HzsD6/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'    
-  #           fi
+      - run:
+          name: Send migration status to kvdb.io
+          command: |
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then  
+                curl -k https://kvdb.io/QEJEyEvRANuKVVDM2HzsD6/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'    
+            fi
 
-  #     - destroy-environment
+      - destroy-environment
       
-  #     - revert-migrations
+      - revert-migrations
 
   # deploy-frontend:
   #   docker:
@@ -567,8 +567,8 @@ workflows:
               only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
       # - deploy-backend:
