@@ -47,5 +47,7 @@
      tar xzvf artifact.tar.gz
      npm install
      npm run build
+     cp .env dist
+     cd dist
      pm2 stop all
-     pm2 start npm -- start
+     pm2 start main.js
